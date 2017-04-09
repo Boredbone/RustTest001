@@ -17,12 +17,9 @@ fn main() {
             .read_line(&mut input_text)
             .expect("failed to read from stdin");
 
-        let trimmed = input_text.trim();
-
-        match trimmed.parse::<u32>() {
+        match input_text.trim().parse::<u32>() {
             Ok(i) => {
-                let mut fib1 = &mut fib;
-                let x = fib1.into_iter().skip(i as usize).next().unwrap();
+                let x = fib.into_iter().skip(i as usize).next().unwrap();
                 println!("{} : {} ({})", i, x.to_string(), x.get_code());
             }
             Err(..) => break,
@@ -33,16 +30,14 @@ fn main() {
 
 struct Fib {
     is_zero: bool,
-    z2: BigInteger,
-    z1: BigInteger,
+    z: (BigInteger, BigInteger),
 }
 
 impl Fib {
     pub fn new() -> Fib {
         Fib {
             is_zero: true,
-            z2: BigInteger::one(),
-            z1: BigInteger::zero(),
+            z: (BigInteger::one(), BigInteger::zero()),
         }
     }
 }
@@ -54,11 +49,9 @@ impl Iterator for Fib {
             self.is_zero = false;
             Some(BigInteger::zero())
         } else {
-            let r = &self.z2 + &self.z1;
-            self.z2 = self.z1.clone();
-            self.z1 = r.clone();
-            println!("next : {}", r.to_string());
-            Some(r)
+            self.z = (self.z.1.clone(), (&self.z.0 + &self.z.1));
+            println!("next : {}", self.z.1.to_string());
+            Some(self.z.1.clone())
         }
     }
 }
